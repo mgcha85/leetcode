@@ -1066,7 +1066,53 @@ class Solution:
             i2 += 1
         return -1
 
+    def isValidSudoku(self, board):
+        def get_column(board, ncol):
+            for row in board:
+                yield row[ncol]
+
+        def get_batch(board):
+            for i in range(0, 9, 3):
+                for j in range(0, 9, 3):
+                    out = []
+                    for r in board[i: i + 3]:
+                        out.extend(r[j: j + 3])
+                    yield out
+
+        board_batch = get_batch(board)
+        # 3 x 3 check
+        for bb in board_batch:
+            bb_str = ''.join(bb).replace('.', '')
+            n = len(bb_str)
+            if n != len(set(bb_str)):
+                return False
+
+        for i in range(9):
+            row = board[i]
+            row_str = ''.join(row).replace('.', '')
+            n = len(row_str)
+            if n != len(set(row_str)):
+                return False
+
+        for i in range(9):
+            col = get_column(board, i)
+            col_str = ''.join(col).replace('.', '')
+            n = len(col_str)
+            if n != len(set(col_str)):
+                return False
+
+        return True
+
 
 if __name__ == '__main__':
     s = Solution()
-    print(s.search([1, 3], 1))
+    print(s.isValidSudoku(
+        [[".",".",".",".","5",".",".","1","."],
+         [".","4",".","3",".",".",".",".","."],
+         [".",".",".",".",".","3",".",".","1"],
+         ["8",".",".",".",".",".",".","2","."],
+         [".",".","2",".","7",".",".",".","."],
+         [".","1","5",".",".",".",".",".","."],
+         [".",".",".",".",".","2",".",".","."],
+         [".","2",".","9",".",".",".",".","."],
+         [".",".","4",".",".",".",".",".","."]]))
