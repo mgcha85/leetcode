@@ -956,65 +956,29 @@ class Solution:
             divisor = -divisor
 
         of = (1 << 31)
-        if divisor == 1 and not (-of <= dividend < of - 1):
-            if sign > 0:
-                return sign * (of - 1)
-            else:
-                return sign * of
-
         if divisor == 1:
+            if not(-of <= dividend < of - 1):
+                if sign > 0:
+                    return sign * (of - 1)
+                else:
+                    return sign * of
             return sign * dividend
 
-        if dividend < divisor:
-            return 0
+        res = 0
+        i = 0
+        while divisor << i <= dividend:
+            i += 1
 
-        if dividend == divisor:
-            return sign * 1
+        for j in range(i, -1, -1):
+            div = (divisor << j)
+            if div <= dividend:
+                dividend -= div
+                res += 1 << j
 
-        if divisor == 2:
-            return sign * int(bin(dividend)[2:-1], 2)
+        if res <= -1 << 31:
+            return -res
 
-        def closest_bigger(val):
-            val = bin(val)[2:]
-            return len(val)
-
-        def closest_smaller(val):
-            val = bin(val)[2:]
-            return len(val) - 1
-
-        def multiply(val, n):
-            sum = 0
-            for i in range(n):
-                sum += val
-            return sum
-
-        dvd_big = closest_bigger(dividend)
-        dvd_sma = closest_smaller(dividend)
-
-        dvs_big = closest_bigger(divisor)
-        dvs_sma = closest_smaller(divisor)
-
-        n = dvd_big - dvs_sma
-        m = dvd_sma - dvs_big
-
-        max = 1 << n
-        if m < 1:
-            min = 1
-        else:
-            min = 1 << m
-
-        low_val = multiply(divisor, min)
-        high_val = multiply(divisor, max)
-        if abs(low_val - dividend) < abs(high_val - dividend):
-            for i in range(min + 1, max, 1):
-                quat = multiply(divisor, i)
-                if quat < dividend and abs(dividend - quat) < divisor:
-                    return i * sign
-        else:
-            for i in range(max, min, -1):
-                quat = multiply(divisor, i)
-                if quat < dividend and abs(dividend - quat) < divisor:
-                    return i * sign
+        return sign * res
 
     def nextPermutation(self, nums):
         """
@@ -1029,7 +993,7 @@ class Solution:
             return True
 
         def bigger_closest(A, val):
-            diff = 10
+            diff = 1 << 31
             ret = A[0]
             idx = 0
             for i, a in enumerate(A):
@@ -1040,15 +1004,22 @@ class Solution:
                         idx = i
             return ret, idx
 
+        def swap(A):
+            n = len(A) // 2
+            for i in range(n):
+                temp = A[i]
+                A[i] = A[-i - 1]
+                A[-i - 1] = temp
+
         if is_max(nums) is True:
-            nums = nums[::-1]
-            return nums
+            swap(nums)
+            return
 
         if nums[-1] > nums[-2]:
             temp = nums[-1]
             nums[-1] = nums[-2]
             nums[-2] = temp
-            return nums
+            return
 
         N = len(nums)
         for i in range(N - 3, -1, -1):
@@ -1063,9 +1034,39 @@ class Solution:
                 nums[i] = n
                 nums[i + 1:] = sorted(remains)
                 break
-        return nums
+
+    def search(self, nums, target, mid=0):
+        N = len(nums)
+
+        if N < 1:
+            return -1
+
+        if N == 1:
+            if nums[0] == target:
+                return 0
+            else:
+                return -1
+
+        mid = N // 2
+
+        g1 = nums[:mid]
+        g2 = nums[mid:]
+        self.search(g1, target, 0)
+        self.search(g2, target, mid)
+
+        i1 = 0
+        i2 = 0
+        while i1 < len(g1) and i2 < len(g2):
+            if g1[i1] == target:
+                return i1 + mid
+            if g2[i2] == target:
+                return i2 + mid
+
+            i1 += 1
+            i2 += 1
+        return -1
 
 
 if __name__ == '__main__':
     s = Solution()
-    print(s.nextPermutation([5, 4, 7, 5, 3, 2]))
+    print(s.search([1, 3], 1))
