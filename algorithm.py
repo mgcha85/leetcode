@@ -1103,16 +1103,481 @@ class Solution:
 
         return True
 
+    def combinationSum(self, candidates, target):
+        """
+        :type candidates: List[int]
+        :type target: int
+        :rtype: List[List[int]]
+        """
+
+        from itertools import combinations
+        out = []
+
+        n = len(candidates)
+        for i in range(n):
+            for cb in combinations(candidates, i + 1):
+                sumc = sum(cb)
+                if sumc == target:
+                    out.append(list(cb))
+
+                elif sumc < target:
+                    diff = target - sumc
+                    mult = [x for x in cb if diff % x == 0]
+                    if mult:
+                        q = diff // mult[0]
+                        out.append(list(cb) + [mult[0]] * q)
+        return out
+
+    def mergeTwoLists(self, l1, l2):
+        """
+        :type l1: ListNode
+        :type l2: ListNode
+        :rtype: ListNode
+        """
+
+        class Node:
+            def __init__(self, val, prev=None, next=None):
+                self.val = val
+                self.next = next
+                self.prev = prev
+
+        l1_init = l1
+        l2_init = l2
+
+        pnode = None
+        while l1 and l2:
+            if l1.val < l2.val:
+                ln = l1
+                l1.next.prev = None
+            else:
+                ln = l2
+                l2.next.prev = None
+
+            if pnode is None:
+                node = Node(ln.val)
+            else:
+                pnode.next = node
+
+            pnode = node
+            l1 = l1.next
+            l2 = l2.next
+        return node
+
+    def removeElement(self, nums, val):
+        """
+        :type nums: List[int]
+        :type val: int
+        :rtype: int
+        """
+
+        if len(nums) <= 1:
+            return nums
+
+        while True:
+            try:
+                idx = nums.index(val)
+                nums.pop(idx)
+            except:
+                return nums
+
+    def strStr(self, haystack, needle):
+        """
+        :type haystack: str
+        :type needle: str
+        :rtype: int
+        """
+
+        M = len(needle)
+        N = len(haystack)
+        if M > N:
+            return -1
+        elif haystack == needle:
+            return 0
+
+        for i in range(N - M + 1):
+            print(haystack[i: i + M])
+            if needle == haystack[i: i + M]:
+                return i
+        return -1
+
+    def countAndSay(self, n):
+        """
+        :type n: int
+        :rtype: str
+        """
+
+        if n == 1:
+            return '1'
+        elif n >= 30:
+            return
+
+        strn = '1'
+        for i in range(1, n):
+            ps = strn[0]
+            contents = [[ps, 1]]
+
+            for j in range(1, len(strn)):
+                if ps == strn[j]:
+                    contents[-1][-1] += 1
+                else:
+                    contents.append([strn[j], 1])
+                ps = strn[j]
+
+            strn = ''
+            for con in contents:
+                strn += str(con[-1])
+                strn += con[0]
+
+        return strn
+
+    def isPalindrome(self, s):
+            """
+            :type s: str
+            :rtype: bool
+            """
+
+            s = s.replace(' ', '')
+            if len(s) <= 0:
+                return True
+
+            def trim(s):
+                for ch in s:
+                    if not ch.isalpha():
+                        s = s.replace(ch, "")
+                    else:
+                        s = s.lower()
+                return s
+
+            s = trim(s)
+            N = len(s)
+            if N == 0: return True
+
+            m = N // 2
+
+            for i in range(m):
+                if s[i] != s[-i - 1]:
+                    return False
+            return True
+
+    def singleNumber(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+
+        while nums:
+            ele = nums.pop(0)
+            if ele not in nums:
+                return ele
+            else:
+                nums.remove(ele)
+        return ele
+
+    def convertToTitle(self, n):
+        """
+        :type n: int
+        :rtype: str
+        """
+        if n == 0:
+            return
+
+        if n <= 26:
+            res = [n]
+        else:
+            res = []
+            while n > 26:
+                r = n % 26
+                n = n // 26
+                if r == 0:
+                    n -= 1
+                    r = 26
+                res.append(r)
+            res.append(n)
+
+        ret = ''
+        for r in res[::-1]:
+            ret += chr(64 + r)
+        return ret
+
+    def trailingZeroes(self, n):
+        """
+        :type n: int
+        :rtype: int
+        """
+
+        def get_five(n):
+            if n < 5:
+                return 0
+            q = n // 5
+            return q + get_five(q)
+        return get_five(n)
+
+    def rotate(self, nums, k):
+        """
+        Do not return anything, modify nums in-place instead.
+        """
+        n = len(nums)
+        if n == 0 or n < k:
+            return
+
+        tail = nums[-k:]
+        header = nums[:-k]
+        nums[:k] = tail
+        nums[k:] = header
+        return nums
+
+    def reverseBits(self, n):
+        b = bin(n)[2:]
+        n = len(b)
+        if n >= 32:
+            return b[::-1]
+        zp = '{number:0{width}d}'.format(width=32 - n, number=0)
+        return int((zp + b)[::-1], 2)
+
+    def hammingWeight(self, n):
+        """
+        :type n: int
+        :rtype: int
+        """
+        return len(bin(n)[2:].replace('0', ''))
+
+    def rob(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        n = len(nums)
+        for i in range(n):
+            for j in range(n-i):
+                if i == j:
+                    continue
+
+    def isHappy(self, n):
+        """
+        :type n: int
+        :rtype: bool
+        """
+
+        def get_happy_number(n):
+            sum = 0
+            for d in str(n):
+                sum += int(d) ** 2
+            return sum
+
+        history = []
+        while True:
+            n = get_happy_number(n)
+            if n == 1:
+                return True
+            elif n in history:
+                return False
+            else:
+                history.append(n)
+
+    def countPrimes(self, n):
+        """
+        :type n: int
+        :rtype: int
+        """
+
+        def isPrime(n):
+            # This is checked so that we can skip
+            # middle five numbers in below loop
+            if (n % 2 == 0 or n % 3 == 0):
+                return False
+
+            i = 5
+            while (i * i <= n):
+                if (n % i == 0 or n % (i + 2) == 0):
+                    return False
+                i = i + 6
+
+            return True
+
+        if n <= 1:
+            return 0
+        elif n == 2:
+            return 1
+        elif n < 5:
+            return 2
+
+        cnt = 3
+        for i in range(5, n):
+            if isPrime(i):
+                cnt += 1
+        return cnt
+
+    def findShortestSubArray(self, nums):
+        right, left, count = {}, {}, {}
+        for i, n in enumerate(nums):
+            if n not in left: left[n] = i
+            right[n] = i
+            count[n] = count.get(n, 0) + 1
+
+        N = len(nums)
+        degree = max(count.values())
+        ans = N
+        for ele, cnt in count.items():
+            if cnt == degree:
+                ans = min(ans, right[ele] - left[ele] + 1)
+        return ans
+
+    def spiralOrder(self, matrix):
+        """
+        :type matrix: List[List[int]]
+        :rtype: List[int]
+        """
+        if not matrix:
+            return []
+
+        m, n = len(matrix), len(matrix[0])
+        if n == 0:
+            return []
+
+        seen = [[False] * n for _ in range(m)]
+        ans = []
+        dr = [0, 1, 0, -1]
+        dc = [1, 0, -1, 0]
+        r = c = di = 0
+
+        for _ in range(m * n):
+            ans.append(matrix[r][c])
+            seen[r][c] = True
+            cr, cc = r + dr[di], c + dc[di]
+            if seen[r][c] is False and 0 <= cr < m and 0 <= cc < n:
+                r, c = cr, cc
+            else:
+                di = (di + 1) % 4
+                r, c = r + dr[di], c + dc[di]
+        return ans
+
+    def generateMatrix(self, n):
+        """
+        :type n: int
+        :rtype: List[List[int]]
+        """
+
+        if n == 1:
+            return [[1]]
+
+        ans = [[0] * n for _ in range(n)]
+        r = c = di = 0
+        rd = [0, 1, 0, -1]
+        cd = [1, 0, -1, 0]
+
+        for i in range(n ** 2):
+            ans[r][c] = i + 1
+            cr, cc = r + rd[di], c + cd[di]
+            if 0 <= cr < n and 0 <= cc < n and ans[cr][cc] == 0:
+                r, c = cr, cc
+            else:
+                di = (di + 1) % 4
+                r, c = r + rd[di], c + cd[di]
+        return ans
+
+    def fullJustify(self, words, maxWidth):
+        """
+        :type words: List[str]
+        :type maxWidth: int
+        :rtype: List[str]
+        """
+
+        rows = {0: []}
+        wpl = []
+        cnt = nrows = sum_len = 0
+        for i, word in enumerate(words):
+            sum_len += len(word)
+            rows[nrows].append(word)
+
+            cnt += 1
+            if sum_len + cnt - 1 > maxWidth:
+                sum_len = len(word)
+                rows[nrows].pop(-1)
+                nrows += 1
+                rows[nrows] = [word]
+                wpl.append(cnt - 1)
+                cnt = 1
+
+        ans = []
+        for idx, words in rows.items():
+            sum_len = 0
+            n = len(words)
+
+            for i, word in enumerate(words):
+                if i < len(words) - 1:
+                    words[i] = word + ' '
+                sum_len += len(words[i])
+
+            if idx == nrows:
+                pad = (maxWidth - sum_len)
+                words[-1] += ' ' * pad
+            else:
+                if n == 1:
+                    words[-1] = words[-1] + ' ' * (maxWidth - sum_len)
+                else:
+                    pad = (maxWidth - sum_len) // (n - 1)
+                    for k in range(n - 1):
+                        words[k] = words[k] + ' ' * pad
+
+                    width = sum_len + pad * (n - 1)
+                    if maxWidth != width:
+                        diff = maxWidth - width
+                        for d in range(diff):
+                            words[d] = words[d] + ' '
+            ans.append(''.join(words))
+        return ans
+
+    def evaluate_expr(self, stack):
+        res = stack.pop() if stack else 0
+
+        # Evaluate the expression till we get corresponding ')'
+        while stack and stack[-1] != ')':
+            sign = stack.pop()
+            if sign == '+':
+                res += stack.pop()
+            else:
+                res -= stack.pop()
+        return res
+
+    def calculate(self, s: str) -> int:
+        stack = []
+        n, operand = 0, 0
+
+        for i in range(len(s) - 1, -1, -1):
+            ch = s[i]
+            if ch.isdigit():
+
+                # Forming the operand - in reverse order.
+                operand = (10 ** n * int(ch)) + operand
+                n += 1
+
+            elif ch != " ":
+                if n:
+                    # Save the operand on the stack
+                    # As we encounter some non-digit.
+                    stack.append(operand)
+                    n, operand = 0, 0
+
+                if ch == '(':
+                    res = self.evaluate_expr(stack)
+                    stack.pop()
+
+                    # Append the evaluated result to the stack.
+                    # This result could be of a sub-expression within the parenthesis.
+                    stack.append(res)
+
+                # For other non-digits just push onto the stack.
+                else:
+                    stack.append(ch)
+
+        # Push the last operand to stack, if any.
+        if n:
+            stack.append(operand)
+
+        # Evaluate any left overs in the stack.
+        return self.evaluate_expr(stack)
+
 
 if __name__ == '__main__':
     s = Solution()
-    print(s.isValidSudoku(
-        [[".",".",".",".","5",".",".","1","."],
-         [".","4",".","3",".",".",".",".","."],
-         [".",".",".",".",".","3",".",".","1"],
-         ["8",".",".",".",".",".",".","2","."],
-         [".",".","2",".","7",".",".",".","."],
-         [".","1","5",".",".",".",".",".","."],
-         [".",".",".",".",".","2",".",".","."],
-         [".","2",".","9",".",".",".",".","."],
-         [".",".","4",".",".",".",".",".","."]]))
+    print(s.calculate("1-(2+3-(4+(5-(1-(2+4-(5+6))))))"))
