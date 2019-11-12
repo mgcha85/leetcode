@@ -132,7 +132,251 @@ class coding_test:
         else:
             return ans
 
+    def maxProfit1(self, prices):
+        if not prices:
+            return []
+
+        if len(prices) == 1:
+            return 0
+
+        T_i10 = 0
+        T_i11 = float('-inf')
+
+        for price in prices:
+            T_i10 = max(T_i10, T_i11 + price)
+            T_i11 = max(T_i11, -price)
+        return T_i10
+
+    def maxProfit2(self, prices):
+        T_ik0, T_ik1 = 0, float('-inf')
+
+        for price in prices:
+            T_ik0_old = T_ik0
+            T_ik0 = max(T_ik0, T_ik1 + price)
+            T_ik1 = max(T_ik1, T_ik0_old - price)
+        return T_ik0
+
+    def maxProfit3(self, prices):
+        T_i10 = T_i20 = 0
+        T_i11 = T_i21 = float('-inf')
+
+        for price in prices:
+            T_i20 = max(T_i20, T_i21 + price)
+            T_i21 = max(T_i21, T_i10 - price)
+            T_i10 = max(T_i10, T_i11 + price)
+            T_i11 = max(T_i11, -price)
+        return T_i20
+
+    def maxProfit4(self, k, prices):
+        if k > len(prices):
+            T_ik0, T_ik1 = 0, float('-inf')
+            for price in prices:
+                T_ik0_old = T_ik0
+                T_ik0 = max(T_ik0, T_ik1 + price)
+                T_ik1 = max(T_ik1, T_ik0_old - price)
+            return T_ik0
+
+        T_ik0 = [0] * (k + 1)
+        T_ik1 = [float('-inf')] * (k + 1)
+        for price in prices:
+            for i in range(k, 0, -1):
+                T_ik0[i] = max(T_ik0[i], T_ik1[i] + price)
+                T_ik1[i] = max(T_ik1[i], T_ik0[i - 1] - price)
+        return T_ik0[k]
+
+    def maxProfit5(self, prices):
+        T_ik0_pre, T_ik0, T_ik1 = 0, 0, float('-inf')
+
+        for price in prices:
+            T_ik0_old = T_ik0
+            T_ik0 = max(T_ik0, T_ik1 + price)
+            T_ik1 = max(T_ik1, T_ik0_pre - price)
+            T_ik0_pre = T_ik0_old
+        return T_ik0
+
+    def maxProfit6(self, prices, fee):
+        T_ik0, T_ik1 = 0, float('-inf')
+
+        for price in prices:
+            T_ik0_old = T_ik0
+            T_ik0 = max(T_ik0, T_ik1 + price - fee)
+            T_ik1 = max(T_ik1, T_ik0_old - price)
+        return T_ik0
+
+    def findKthNumber(self, n: int, k: int) -> int:
+        if n < 10:
+            return k
+
+        cur = 1
+        k -= 1
+        while k > 0:
+            step = 0
+            first = cur
+            last = cur + 1
+
+            while first <= n:
+                step += min(n + 1, last) - first
+                first *= 10
+                last *= 10
+
+            if step <= k:
+                cur += 1
+                k -= step
+            else:
+                cur *= 10
+                k -= 1
+        return cur
+
+    def find_all(self, a, sub):
+        start = 0
+        while True:
+            start = a.find(sub, start)
+            if start == -1: return
+            yield start
+            start += len(sub)
+
+    def lastSubstring(self, s: str) -> str:
+        if len(set(s)) == 1:
+            return s
+
+        max_s = sorted(list(s))[-1]
+        idxs = list(self.find_all(s, max_s))
+
+        while True:
+            next = []
+            for idx in idxs:
+                if idx + 1 < len(s):
+                    next.append(max_s + s[idx + len(max_s)])
+
+            if not next:
+                return s[idxs[0]:]
+
+            max_s = sorted(next)[-1]
+            idxs = list(self.find_all(s, max_s))
+            if len(idxs) == 1:
+                return s[idxs[0]:]
+
+    def findDiagonalOrder(self, matrix):
+        m = len(matrix)
+        n = len(matrix[0]) if m > 0 else 0
+        if n == 0:
+            return []
+
+        result = [0 for _ in range(m * n)]
+        up = True
+        row = col = 0
+
+        for i in range(m * n):
+            result[i] = matrix[row][col]
+
+            # check right bolder before top bolder in up trend
+            if up:
+                if col == n - 1:
+                    row = row + 1
+                    up = not up
+                elif row == 0:
+                    col = col + 1
+                    up = not up
+                else:
+                    row = row - 1
+                    col = col + 1
+
+            # check bottom bolder before left bolder in down trend
+            else:
+                if row == m - 1:
+                    col = col + 1
+                    up = not up
+                elif col == 0:
+                    row = row + 1
+                    up = not up
+                else:
+                    row = row + 1
+                    col = col - 1
+
+        return result
+
+    def game_play_analysis(self):
+        import sqlite3
+
+        # con = sqlite3.connect('leetcode.sqlite')
+        # sql = "CREATE TABLE Activity2 (" \
+        # "player_id INTEGER," \
+        # "device_id INTEGER,"\
+        # "event_date DATE," \
+        # "games_played INTEGER" \
+        # ");"
+        # con.cursor().execute(sql)
+
+        con = sqlite3.connect('leetcode.sqlite')
+        c = con.cursor()
+        # sql = "SELECT player_id, event_date AS first_login FROM Activity GROUP BY player_id HAVING MIN(event_date)"
+        # sql = "SELECT player_id, device_id FROM Activity GROUP BY player_id HAVING MIN(event_date)"
+        sql = "SELECT player_id, device_id, SUM(games_played) AS games_played_so_far FROM Activity GROUP BY player_id "
+        return c.execute(sql).fetchall()
+
+    def employee_bonus(self):
+        import sqlite3
+
+        # con = sqlite3.connect('leetcode.sqlite')
+        # sql = "CREATE TABLE Employee (" \
+        # "empId INTEGER," \
+        # "name STRING,"\
+        # "supervisor STRING," \
+        # "salary INTEGER" \
+        # ");"
+        # con.cursor().execute(sql)
+        # sql = "CREATE TABLE Bonus (" \
+        # "empId INTEGER," \
+        # "bonus INTEGER" \
+        # ");"
+        # con.cursor().execute(sql)
+
+        con = sqlite3.connect('leetcode.sqlite')
+        c = con.cursor()
+        sql = "SELECT Employee.name, Bonus.bonus " \
+              "FROM " \
+              "Employee LEFT OUTER JOIN " \
+              "Bonus ON Employee.empid=Bonus.empid WHERE bonus<1000 OR bonus IS NULL"
+        return c.execute(sql).fetchall()
+
+    def find_customer_referee(self):
+        import sqlite3
+
+        # con = sqlite3.connect('leetcode.sqlite')
+        # sql = "CREATE TABLE customer (" \
+        # "id INTEGER," \
+        # "name STRING,"\
+        # "referee_id STRING" \
+        # ");"
+        # con.cursor().execute(sql)
+
+        con = sqlite3.connect('leetcode.sqlite')
+        c = con.cursor()
+        sql = "SELECT name FROM customer WHERE referee_id!=2 OR referee_id IS NULL"
+        return c.execute(sql).fetchall()
+
+    def customer_placing(self):
+        import sqlite3
+
+        # con = sqlite3.connect('leetcode.sqlite')
+        # sql = "CREATE TABLE orders (" \
+        # "order_number INTEGER," \
+        # "customer_number INTEGER,"\
+        # "order_date DATE,"\
+        # "required_date DATE,"\
+        # "shipped_date DATE,"\
+        # "status STRING,"\
+        # "comment STRING" \
+        # ");"
+        # con.cursor().execute(sql)
+
+        con = sqlite3.connect('leetcode.sqlite')
+        c = con.cursor()
+        sql = "SELECT customer_number FROM orders GROUP BY customer_number ORDER BY COUNT(*) DESC LIMIT 1"
+        return c.execute(sql).fetchall()
+
 
 if __name__ == '__main__':
     ct = coding_test()
-    print(ct.reverse(1463847412))
+    print(ct.customer_placing())
+    # print(ct.findDiagonalOrder([[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,16]]))
