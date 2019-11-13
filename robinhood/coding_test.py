@@ -295,67 +295,78 @@ class coding_test:
 
         return result
 
-    def game_play_analysis(self):
+    def shortest_distance(self):
         import sqlite3
-
-        # con = sqlite3.connect('leetcode.sqlite')
-        # sql = "CREATE TABLE Activity2 (" \
-        # "player_id INTEGER," \
-        # "device_id INTEGER,"\
-        # "event_date DATE," \
-        # "games_played INTEGER" \
-        # ");"
-        # con.cursor().execute(sql)
 
         con = sqlite3.connect('leetcode.sqlite')
         c = con.cursor()
-        # sql = "SELECT player_id, event_date AS first_login FROM Activity GROUP BY player_id HAVING MIN(event_date)"
-        # sql = "SELECT player_id, device_id FROM Activity GROUP BY player_id HAVING MIN(event_date)"
-        sql = "SELECT player_id, device_id, SUM(games_played) AS games_played_so_far FROM Activity GROUP BY player_id "
+        sql = "SELECT min(abs(p1.x-p2.x)) as shortest FROM point p1 JOIN point p2 ON p1.x!=p2.x"
         return c.execute(sql).fetchall()
 
-    def employee_bonus(self):
+    def biggest_single(self):
         import sqlite3
-
-        # con = sqlite3.connect('leetcode.sqlite')
-        # sql = "CREATE TABLE Employee (" \
-        # "empId INTEGER," \
-        # "name STRING,"\
-        # "supervisor STRING," \
-        # "salary INTEGER" \
-        # ");"
-        # con.cursor().execute(sql)
-        # sql = "CREATE TABLE Bonus (" \
-        # "empId INTEGER," \
-        # "bonus INTEGER" \
-        # ");"
-        # con.cursor().execute(sql)
 
         con = sqlite3.connect('leetcode.sqlite')
         c = con.cursor()
-        sql = "SELECT Employee.name, Bonus.bonus " \
-              "FROM " \
-              "Employee LEFT OUTER JOIN " \
-              "Bonus ON Employee.empid=Bonus.empid WHERE bonus<1000 OR bonus IS NULL"
+        sql = "SELECT num FROM my_numbers GROUP BY num HAVING COUNT(*)==1 ORDER BY num DESC LIMIT 1"
         return c.execute(sql).fetchall()
 
-    def find_customer_referee(self):
-        import sqlite3
+    def prefixString(self, a, b):
+        pre_fix = []
+        s = ''
+        for e in a:
+            s += e
+            pre_fix.append(s)
 
-        # con = sqlite3.connect('leetcode.sqlite')
-        # sql = "CREATE TABLE customer (" \
-        # "id INTEGER," \
-        # "name STRING,"\
-        # "referee_id STRING" \
-        # ");"
-        # con.cursor().execute(sql)
+        if len(set(b) - set(pre_fix)) == 0:
+            return True
+        else:
+            return False
 
-        con = sqlite3.connect('leetcode.sqlite')
-        c = con.cursor()
-        sql = "SELECT name FROM customer WHERE referee_id!=2 OR referee_id IS NULL"
-        return c.execute(sql).fetchall()
+    def frameGenerator(self, n):
+        ans = []
+        for i in range(n):
+            row = []
+            for j in range(n):
+                if i == 0 or j == 0 or i == n-1 or j == n-1:
+                    row.append('*')
+                else:
+                    row.append(' ')
+            ans.append(row)
+        return ans
 
-    def customer_placing(self):
+    def sortMatrixByOccurrences(self, matrix):
+        if not matrix:
+            return
+        if not matrix[0]:
+            return
+
+        m = len(matrix)
+        freq = {}
+        for r in range(m):
+            for c in range(m):
+                freq[matrix[r][c]] = freq.get(matrix[r][c], 0) + 1
+
+        freq = sorted(freq.items(), key=lambda x: (x[1], x[0]))
+        r = c = m-1
+        sr, sc = m-1, m-1
+        dr, dc = -1, 1
+        for ele in freq:
+            v, f = ele
+            for i in range(f):
+                matrix[r][c] = v
+                cr, cc = r + dr, c + dc
+                if not(0 <= cr < m) or not(0 <= cc < m):
+                    sc -= 1
+                    if sc < 0:
+                        sr -= 1
+                        sc = 0
+                    r, c = sr, sc
+                else:
+                    r, c = cr, cc
+        return matrix
+
+    def sql(self):
         import sqlite3
 
         # con = sqlite3.connect('leetcode.sqlite')
@@ -378,5 +389,5 @@ class coding_test:
 
 if __name__ == '__main__':
     ct = coding_test()
-    print(ct.customer_placing())
+    print(ct.sql())
     # print(ct.findDiagonalOrder([[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,16]]))
