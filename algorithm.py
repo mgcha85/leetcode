@@ -1341,17 +1341,6 @@ class Solution:
         """
         return len(bin(n)[2:].replace('0', ''))
 
-    def rob(self, nums):
-        """
-        :type nums: List[int]
-        :rtype: int
-        """
-        n = len(nums)
-        for i in range(n):
-            for j in range(n-i):
-                if i == j:
-                    continue
-
     def isHappy(self, n):
         """
         :type n: int
@@ -1577,7 +1566,42 @@ class Solution:
         # Evaluate any left overs in the stack.
         return self.evaluate_expr(stack)
 
+    def longestPalindrome(self, s: str) -> str:
+        def is_palindrome(s):
+            n = len(s)
+            if n == 1:
+                return True
+
+            for i in range(n // 2):
+                if s[i] != s[-i - 1]:
+                    return False
+            return True
+
+        n = len(s)
+        if n <= 1:
+            return s
+        if is_palindrome(s):
+            return s
+
+        end = len(s) - 1
+        for j in range(end, 0, -1):
+            for k in range(n - j + 1):
+                if is_palindrome(s[k: k + j]):
+                    return s[k: k + j]
+        return ''
+
+    def rob(self, nums):
+        if len(nums) == 0:
+            return 0
+        if len(nums) <= 2:
+            return max(nums)
+
+        nums = [0, 0] + nums
+        for i, num in enumerate(nums[2:]):
+            nums[i + 2] = max(nums[i] + nums[i + 2], nums[i + 1])
+        return max(nums)
+
 
 if __name__ == '__main__':
     s = Solution()
-    print(s.calculate("1-(2+3-(4+(5-(1-(2+4-(5+6))))))"))
+    print(s.rob([2,7,9,3,1]))
