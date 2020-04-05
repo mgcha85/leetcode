@@ -1,3 +1,14 @@
+class TreeNode:
+    def __init__(self, x):
+        self.val = x
+        self.left = None
+        self.right = None
+
+class Node:
+    def __init__(self, val=None, children=None):
+        self.val = val
+        self.children = children
+
 
 class Solution:
     # Given an array of integers, return indices of the two numbers such that they add up to a specific target.
@@ -1601,7 +1612,86 @@ class Solution:
             nums[i + 2] = max(nums[i] + nums[i + 2], nums[i + 1])
         return max(nums)
 
+    def isSameTree(self, p, q):
+        # 100. Same Tree
+        if not p and not q:
+            return True
+
+        if not q or not p:
+            return False
+
+        if p.val != q.val:
+            return False
+
+        return self.isSameTree(p.right, q.right) and self.isSameTree(p.left, q.left)
+
+    def maxDepth(self, root, depth=1) -> int:
+        # 	104 Maximum Depth of Binary Tree
+        if not root:
+            return depth - 1
+
+        ldepth = self.maxDepth(root.left, depth + 1)
+        rdepth = self.maxDepth(root.right, depth + 1)
+        if ldepth > rdepth:
+            return ldepth
+        else:
+            return rdepth
+
+    def maxDepth2(self, root, depth=0) -> int:
+        # 	559. Maximum Depth of N-ary Tree
+        import collections
+
+        if not root:
+            return 0
+
+        if not root.children:
+            return depth + 1
+
+        for child in root.children:
+            depth = self.maxDepth(child, depth + 1)
+
+        queue, depth = collections.deque(), 0
+        queue.append(root)
+
+        while queue:
+            depth += 1
+            size = len(queue)
+
+            for _ in range(size):
+                node = queue.popleft()
+                for child in node.children:
+                    queue.append(child)
+
+        return depth
+
+    def increasingBST(self, root: TreeNode) -> TreeNode:
+        # 897. Increasing Order Search Tree
+        def get_elements(root, elements=[]):
+            if not root:
+                return elements
+
+            if root.val is not None:
+                elements.append(root.val)
+
+            get_elements(root.left, elements)
+            get_elements(root.right, elements)
+            return elements
+
+        if not root:
+            return root
+
+        elements = sorted(get_elements(root))
+        ans = cur = TreeNode(elements.pop(0))
+
+        while elements:
+            cur.right = TreeNode(elements.pop(0))
+            cur = cur.right
+        return ans
+
 
 if __name__ == '__main__':
     s = Solution()
-    print(s.rob([2,7,9,3,1]))
+    root = Node(0)
+    # root.left = TreeNode(1)
+    root.val = 44
+    print(s.maxDepth2(root))
